@@ -14,9 +14,12 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Ensure required directories exist
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
-const DATA_DIR = path.join(__dirname, 'data');
+// Handle Vercel serverless environment vs standard server
+const isVercel = Boolean(process.env.VERCEL);
+const BASE_DIR = isVercel ? '/tmp' : __dirname;
+
+const UPLOADS_DIR = path.join(BASE_DIR, 'uploads');
+const DATA_DIR = path.join(BASE_DIR, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
@@ -34,7 +37,11 @@ const readDB = () => {
 };
 
 const writeDB = (data) => {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error('Failed writing DB:', err);
+  }
 };
 
 // Middleware
@@ -74,7 +81,6 @@ async function stampQRCodeOnPDF(pdfBuffer, publicShareUrl) {
     const pdfDoc = await PDFDocument.load(pdfBuffer);
     const pages = pdfDoc.getPages();
     
-    // Generate QR Code PNG Buffer
     const qrBuffer = await QRCode.toBuffer(publicShareUrl, {
       type: 'png',
       width: 150,
@@ -86,7 +92,7 @@ async function stampQRCodeOnPDF(pdfBuffer, publicShareUrl) {
     });
 
     const qrImage = await pdfDoc.embedPng(qrBuffer);
-    const qrDims = qrImage.scale(0.65); // ~100x100px
+    const qrDims = qrImage.scale(0.65);
 
     const firstPage = pages[0];
     const { width, height } = firstPage.getSize();
@@ -476,6 +482,10 @@ if (fs.existsSync(CLIENT_DIST)) {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`🚀 PDF Server running on port ${PORT}`);
-});
+if (!isVercel) {
+  app.listen(PORT, () => {
+    console.log(`🚀 PDF Server running on port ${PORT}`);
+  });
+}
+
+export default app;
