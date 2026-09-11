@@ -213,10 +213,10 @@ app.post('/api/pdfs/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// 4. Generate custom PDF from Builder
+// 4. Generate custom Jeddah Chamber Certificate PDF
 app.post('/api/pdfs/generate', async (req, res) => {
   try {
-    const { title, recipientName, recipientEmail, docDate, notes, items, companyName } = req.body;
+    const { title, chamberData } = req.body;
     
     const docId = nanoid(10);
     const { clientUrl, serverUrl } = getBaseUrls(req);
@@ -224,207 +224,11 @@ app.post('/api/pdfs/generate', async (req, res) => {
     const filename = `generated_${Date.now()}_${docId}.pdf`;
     const filePath = path.join(UPLOADS_DIR, filename);
 
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([595.28, 841.89]);
-    const { width, height } = page.getSize();
-
-    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-    const primaryColor = rgb(0.12, 0.16, 0.23);
-    const accentColor = rgb(0.15, 0.4, 0.95);
-    const textGray = rgb(0.4, 0.45, 0.55);
-
-    page.drawRectangle({
-      x: 0,
-      y: height - 120,
-      width: width,
-      height: 120,
-      color: rgb(0.96, 0.97, 0.99)
-    });
-
-    page.drawRectangle({
-      x: 0,
-      y: height - 6,
-      width: width,
-      height: 6,
-      color: accentColor
-    });
-
-    page.drawText(companyName || 'DOC & PDF PORTAL', {
-      x: 40,
-      y: height - 45,
-      size: 18,
-      font: fontBold,
-      color: primaryColor
-    });
-
-    page.drawText(title || 'OFFICIAL DOCUMENT', {
-      x: 40,
-      y: height - 75,
-      size: 24,
-      font: fontBold,
-      color: accentColor
-    });
-
-    page.drawText(`Document ID: ${docId}`, {
-      x: width - 200,
-      y: height - 45,
-      size: 10,
-      font: fontRegular,
-      color: textGray
-    });
-
-    page.drawText(`Date: ${docDate || new Date().toLocaleDateString()}`, {
-      x: width - 200,
-      y: height - 62,
-      size: 10,
-      font: fontRegular,
-      color: textGray
-    });
-
-    let currentY = height - 150;
-    if (recipientName) {
-      page.drawText('PREPARED FOR:', {
-        x: 40,
-        y: currentY,
-        size: 10,
-        font: fontBold,
-        color: textGray
-      });
-      currentY -= 18;
-      page.drawText(recipientName, {
-        x: 40,
-        y: currentY,
-        size: 14,
-        font: fontBold,
-        color: primaryColor
-      });
-      if (recipientEmail) {
-        currentY -= 14;
-        page.drawText(recipientEmail, {
-          x: 40,
-          y: currentY,
-          size: 10,
-          font: fontRegular,
-          color: textGray
-        });
-      }
-      currentY -= 30;
-    } else {
-      currentY -= 20;
-    }
-
-    if (items && Array.isArray(items) && items.length > 0) {
-      page.drawRectangle({
-        x: 40,
-        y: currentY - 5,
-        width: width - 80,
-        height: 25,
-        color: rgb(0.93, 0.95, 0.98)
-      });
-
-      page.drawText('DESCRIPTION', { x: 50, y: currentY + 3, size: 10, font: fontBold, color: primaryColor });
-      page.drawText('QTY', { x: 330, y: currentY + 3, size: 10, font: fontBold, color: primaryColor });
-      page.drawText('PRICE', { x: 410, y: currentY + 3, size: 10, font: fontBold, color: primaryColor });
-      page.drawText('TOTAL', { x: 490, y: currentY + 3, size: 10, font: fontBold, color: primaryColor });
-
-      currentY -= 30;
-
-      let grandTotal = 0;
-      items.forEach((item) => {
-        const itemTotal = (Number(item.qty) || 0) * (Number(item.price) || 0);
-        grandTotal += itemTotal;
-
-        page.drawText(String(item.description || ''), { x: 50, y: currentY, size: 10, font: fontRegular, color: primaryColor });
-        page.drawText(String(item.qty || 1), { x: 330, y: currentY, size: 10, font: fontRegular, color: primaryColor });
-        page.drawText(`$${Number(item.price || 0).toFixed(2)}`, { x: 410, y: currentY, size: 10, font: fontRegular, color: primaryColor });
-        page.drawText(`$${itemTotal.toFixed(2)}`, { x: 490, y: currentY, size: 10, font: fontBold, color: primaryColor });
-
-        page.drawLine({
-          start: { x: 40, y: currentY - 8 },
-          end: { x: width - 40, y: currentY - 8 },
-          thickness: 0.5,
-          color: rgb(0.9, 0.9, 0.95)
-        });
-
-        currentY -= 25;
-      });
-
-      page.drawText('GRAND TOTAL:', { x: 380, y: currentY - 5, size: 12, font: fontBold, color: primaryColor });
-      page.drawText(`$${grandTotal.toFixed(2)}`, { x: 490, y: currentY - 5, size: 14, font: fontBold, color: accentColor });
-
-      currentY -= 40;
-    }
-
-    if (notes) {
-      page.drawText('NOTES / INSTRUCTIONS:', {
-        x: 40,
-        y: currentY,
-        size: 10,
-        font: fontBold,
-        color: textGray
-      });
-      currentY -= 16;
-
-      const notesLines = notes.split('\n');
-      notesLines.forEach(line => {
-        page.drawText(line, {
-          x: 40,
-          y: currentY,
-          size: 10,
-          font: fontRegular,
-          color: primaryColor
-        });
-        currentY -= 14;
-      });
-    }
-
-    const qrBuffer = await QRCode.toBuffer(publicShareUrl, {
-      type: 'png',
-      width: 150,
-      margin: 1,
-      color: { dark: '#0f172a', light: '#ffffff' }
-    });
-    const qrImage = await pdfDoc.embedPng(qrBuffer);
-    const qrDims = qrImage.scale(0.7);
-
-    const qrX = width - qrDims.width - 40;
-    const qrY = 40;
-
-    page.drawRectangle({
-      x: qrX - 8,
-      y: qrY - 8,
-      width: qrDims.width + 16,
-      height: qrDims.height + 28,
-      color: rgb(1, 1, 1),
-      borderColor: rgb(0.8, 0.85, 0.9),
-      borderWidth: 1
-    });
-
-    page.drawImage(qrImage, {
-      x: qrX,
-      y: qrY + 12,
-      width: qrDims.width,
-      height: qrDims.height
-    });
-
-    page.drawText('SCAN TO VERIFY', {
-      x: qrX + 8,
-      y: qrY,
-      size: 7,
-      font: fontBold,
-      color: accentColor
-    });
-
-    const pdfBytes = await pdfDoc.save();
-    fs.writeFileSync(filePath, Buffer.from(pdfBytes));
-
     const qrDataUrl = await QRCode.toDataURL(publicShareUrl, { margin: 1, width: 250 });
 
     const newPdf = {
       id: docId,
-      title: title || 'Custom Document',
+      title: title || `Jeddah Chamber Certificate - ${docId}`,
       originalName: filename,
       filename,
       fileUrl: `${serverUrl}/uploads/${filename}`,
@@ -432,9 +236,8 @@ app.post('/api/pdfs/generate', async (req, res) => {
       qrDataUrl,
       createdAt: new Date().toISOString(),
       type: 'generated',
-      sizeBytes: pdfBytes.length,
       views: 0,
-      meta: { recipientName, recipientEmail, docDate, notes }
+      chamberData: chamberData || {}
     };
 
     const db = readDB();

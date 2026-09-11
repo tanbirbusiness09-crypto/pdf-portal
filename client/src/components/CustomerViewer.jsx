@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  FileText, 
   Printer, 
   Download, 
   Share2, 
@@ -15,6 +14,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import JeddahChamberDoc from './JeddahChamberDoc';
 
 export default function CustomerViewer({ docId }) {
   const [pdf, setPdf] = useState(null);
@@ -42,13 +42,7 @@ export default function CustomerViewer({ docId }) {
   }, [docId]);
 
   const handlePrint = () => {
-    if (!pdf) return;
-    // Open PDF in hidden print window or trigger print
-    const printWindow = window.open(pdf.fileUrl, '_blank');
-    if (printWindow) {
-      printWindow.focus();
-      printWindow.print();
-    }
+    window.print();
   };
 
   const handleDownload = () => {
@@ -96,10 +90,12 @@ export default function CustomerViewer({ docId }) {
     );
   }
 
+  const isChamberDoc = pdf.chamberData || pdf.type === 'generated';
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-dark)' }}>
       {/* Top Navigation Header for Public Viewer */}
-      <header className="viewer-header">
+      <header className="viewer-header no-print">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div
             style={{
@@ -137,7 +133,6 @@ export default function CustomerViewer({ docId }) {
 
         {/* Viewer Actions Toolbar */}
         <div className="viewer-actions">
-          {/* Zoom Controls */}
           <div style={{ display: 'flex', gap: '2px', background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-sm)', padding: '2px' }}>
             <button
               className="btn btn-secondary"
@@ -168,7 +163,6 @@ export default function CustomerViewer({ docId }) {
             </button>
           </div>
 
-          {/* Action Buttons: Print & Download */}
           <button className="btn btn-secondary" onClick={handleCopyLink}>
             {copied ? <Check size={16} color="#10b981" /> : <Share2 size={16} />}
             <span>{copied ? 'Copied' : 'Share'}</span>
@@ -187,26 +181,32 @@ export default function CustomerViewer({ docId }) {
       </header>
 
       {/* Instruction Notice */}
-      <div style={{ background: 'rgba(59, 130, 246, 0.1)', borderBottom: '1px solid rgba(59, 130, 246, 0.2)', padding: '0.5rem 1.5rem', fontSize: '0.85rem', textAlign: 'center', color: '#93c5fd' }}>
-        💡 নিচে ডক্যুমেন্টটি সরাসরি দেখতে পাবেন। আপনি চাইলে <strong>Save PDF</strong> বাটনে ক্লিক করে ডেক্সটপ/মোবাইলে সেভ অথবা <strong>Print PDF</strong> দিয়ে সরাসরি প্রিন্ট করতে পারেন।
+      <div className="no-print" style={{ background: 'rgba(59, 130, 246, 0.1)', borderBottom: '1px solid rgba(59, 130, 246, 0.2)', padding: '0.5rem 1.5rem', fontSize: '0.85rem', textAlign: 'center', color: '#93c5fd' }}>
+        💡 নিচে ডক্যুমেন্টটি সরাসরি দেখা যাচ্ছে। আপনি চাইলে <strong>Save PDF</strong> বাটনে ক্লিক করে ডেক্সটপ/মোবাইলে সেভ অথবা <strong>Print PDF</strong> দিয়ে সরাসরি প্রিন্ট করতে পারেন।
       </div>
 
-      {/* Main PDF Embed Container */}
-      <main className="pdf-canvas-container">
+      {/* Main Document Embed Container */}
+      <main className="pdf-canvas-container" style={{ padding: '2rem 1rem' }}>
         <div
           style={{
             transform: `scale(${zoom / 100})`,
             transformOrigin: 'top center',
             transition: 'transform 0.2s ease',
             width: '100%',
-            maxWidth: '920px'
+            maxWidth: '850px'
           }}
         >
-          <iframe
-            src={`${pdf.fileUrl}#toolbar=1&navpanes=0`}
-            title={pdf.title}
-            className="pdf-frame"
-          />
+          {isChamberDoc && pdf.chamberData ? (
+            <div className="print-area">
+              <JeddahChamberDoc data={pdf.chamberData} qrDataUrl={pdf.qrDataUrl} />
+            </div>
+          ) : (
+            <iframe
+              src={`${pdf.fileUrl}#toolbar=1&navpanes=0`}
+              title={pdf.title}
+              className="pdf-frame"
+            />
+          )}
         </div>
       </main>
     </div>
