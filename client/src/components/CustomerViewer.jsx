@@ -196,9 +196,13 @@ export default function CustomerViewer({ docId }) {
             maxWidth: '850px'
           }}
         >
-          {isChamberDoc && pdf.chamberData ? (
+          {isChamberDoc ? (
             <div className="print-area">
-              <JeddahChamberDoc data={pdf.chamberData} qrDataUrl={pdf.qrDataUrl} layoutMode={pdf.chamberData?.layoutMode || 'rtl'} />
+              <JeddahChamberDoc
+                data={pdf.chamberData && Object.keys(pdf.chamberData).length > 0 ? pdf.chamberData : { employeeName: pdf.title ? pdf.title.replace('Jeddah Chamber Certificate - ', '') : '' }}
+                qrDataUrl={pdf.qrDataUrl}
+                layoutMode={pdf.chamberData?.layoutMode || 'rtl'}
+              />
             </div>
           ) : (
             <iframe
