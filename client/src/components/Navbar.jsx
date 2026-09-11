@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Upload, PlusCircle, LayoutDashboard, Maximize2, Minimize2 } from 'lucide-react';
+import { FileText, Upload, PlusCircle, LayoutDashboard, Maximize2, Minimize2, Sun, Moon } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -23,6 +31,10 @@ export default function Navbar({ activeTab, setActiveTab }) {
         document.exitFullscreen();
       }
     }
+  };
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
 
   return (
@@ -64,6 +76,17 @@ export default function Navbar({ activeTab, setActiveTab }) {
               <span>PDF Builder</span>
             </button>
           </div>
+
+          {/* Light / Dark Theme Toggle Button */}
+          <button
+            className="btn btn-secondary"
+            onClick={toggleTheme}
+            style={{ padding: '0.5rem 0.85rem', fontSize: '0.85rem' }}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {theme === 'dark' ? <Sun size={16} color="#f59e0b" /> : <Moon size={16} color="#6366f1" />}
+            <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+          </button>
 
           {/* Full Screen Toggle Button */}
           <button
