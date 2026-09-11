@@ -39,6 +39,11 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
     paragraph1Html: defaultDescriptionHtml
   });
 
+  const [generating, setGenerating] = useState(false);
+  const [generatedDoc, setGeneratedDoc] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
+
   const getRandomNum = (min, max) => Math.floor(min + Math.random() * (max - min)).toString();
 
   const generateSingleField = (fieldName) => {
