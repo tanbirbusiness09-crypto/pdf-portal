@@ -62,7 +62,7 @@ export default function App() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="container" style={{ flex: 1, padding: '2rem 1.5rem' }}>
+      <main className="container" style={{ flex: 1, padding: activeTab === 'builder' ? '0.5rem 1rem 0' : '2rem 1.5rem' }}>
         {activeTab === 'dashboard' && (
           <AdminDashboard
             pdfs={pdfs}
@@ -92,12 +92,14 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer style={{ borderTop: '1px solid var(--border-color)', padding: '1.5rem 0', marginTop: '3rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-        <div className="container">
-          PDF Link & QR Code Generation System • Powered by Node.js & React
-        </div>
-      </footer>
+      {/* Footer (Hidden in Builder mode for edge-to-edge full height) */}
+      {activeTab !== 'builder' && (
+        <footer style={{ borderTop: '1px solid var(--border-color)', padding: '1.5rem 0', marginTop: '3rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          <div className="container">
+            PDF Link & QR Code Generation System • Powered by Node.js & React
+          </div>
+        </footer>
+      )}
 
       {/* QR Code Modal Popup */}
       <QrCodeModal pdf={activeQrPdf} onClose={() => setActiveQrPdf(null)} />

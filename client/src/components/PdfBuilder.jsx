@@ -93,32 +93,23 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
   };
 
   return (
-    <div style={{ width: '100%' }}>
-      <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '1.75rem', marginBottom: '0.35rem' }}>
-          Jeddah Chamber Certificate Builder (غرفة جدة)
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          Official Jeddah Chamber of Commerce NOC & Salary Certificate Layout
-        </p>
-      </div>
-
+    <div style={{ width: '100%', height: '100%' }}>
       {!generatedDoc ? (
         <div className="builder-viewport">
           {/* Left Column: Form Controls (Fixed Viewport Scrollable) */}
           <div className="glass-panel builder-form-scroll" style={{ padding: '1.25rem' }}>
-            <div style={{ marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-              <h2 style={{ fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <div style={{ marginBottom: '0.85rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.65rem' }}>
+              <h2 style={{ fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
                 <Sparkles size={18} color="#3b82f6" />
                 <span>Document Form Controls</span>
               </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
                 Edit document text and fields naturally using the MS Word style Visual Editor.
               </p>
             </div>
 
             {/* Form Navigation Tabs */}
-            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '1.1rem' }}>
               <button
                 type="button"
                 className={`builder-tab-btn ${activeFormTab === 'description' ? 'active' : ''}`}

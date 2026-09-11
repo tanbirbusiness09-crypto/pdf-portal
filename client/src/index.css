@@ -341,7 +341,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 1.25rem;
   align-items: start;
   width: 100%;
-  height: calc(100vh - 105px);
+  height: calc(100vh - 75px);
   overflow: hidden;
 }
 
@@ -355,21 +355,21 @@ h1, h2, h3, h4, h5, h6 {
 
 .builder-form-scroll {
   height: 100%;
-  max-height: calc(100vh - 105px);
+  max-height: calc(100vh - 75px);
   overflow-y: auto;
   padding-right: 0.4rem;
 }
 
 .builder-preview-scroll {
   height: 100%;
-  max-height: calc(100vh - 105px);
+  max-height: calc(100vh - 75px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: #525659;
   border-radius: var(--radius-md);
-  padding: 1.25rem;
+  padding: 1rem 1.25rem;
   position: relative;
 }
 
