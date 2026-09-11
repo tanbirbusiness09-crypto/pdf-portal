@@ -9,10 +9,36 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
   const [activeFormTab, setActiveFormTab] = useState('description');
   const [zoomLevel, setZoomLevel] = useState(80);
   const [autoTranslate, setAutoTranslate] = useState(true);
+  const [layoutMode, setLayoutMode] = useState('rtl');
 
-  const defaultDescriptionHtml = `<p style="margin-bottom: 16px; text-align: justify;">This is certified that Mr. <strong>MD SALAUDDIN</strong>, <strong>Bangladeshi</strong> nationality holding passport number <strong>A07950686</strong>, Saudi Arabia resident permit (IQAMA) number <strong>2584923581</strong>, is working as a <strong>General Manager</strong> in <strong>Hussein Mahdi Al Salah Transport</strong>. And he is a senior employee in our company from <strong>January 2014</strong>. And he draws a net monthly salary gross <strong>12,500 SR (twelve thousand five hundred saudi riyals only)</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.</p><p style="margin-bottom: 16px; text-align: justify;">Mr. <strong>MD SALAUDDIN</strong> wants to visit the most beautiful schengen country <strong>Portugal</strong> for <strong>tourism purpose</strong>. We further attested that we do not have any objections if he goes to <strong>Portugal</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.</p>`;
+  const template2CzechSample = {
+    companyNameAr: 'شركة أمازيغ العالمية المحدودة شخص واحد',
+    companyNameEn: 'amazigh alalamiyya Company Ltd. shakhs wahid',
+    applicantNameAr: 'محمد عرفان لياقت علي',
+    applicantNameEn: 'Muhammad Irfan Liaquat Ali',
+    subscriberId: '501815',
+    unifiedNo: '7033135448',
+    crNo: '4030518655',
+    phoneNo: '0159436744',
+    docDate: '10/09/2026',
+    requestNo: '12169816',
+    employeeId: '1355',
+    embassyName: 'Embassy of the Czech Republic',
+    embassyCity: 'Riyadh, Kingdom of Saudi Arabia',
+    employeeName: 'Muhammad Irfan',
+    employeeNationality: 'Pakistani',
+    passportNo: 'DZ1980573',
+    iqamaNo: '2348965084',
+    jobTitle: 'Chief Executive',
+    joiningDate: 'January 2018',
+    monthlySalary: 'SAR 42,000 (Forty-Two Thousand Saudi Riyals)',
+    destinationCountry: 'Czech Republic',
+    travelPurpose: 'tourism purposes',
+    ceoTitle: 'Chief Executive',
+    paragraph1Html: `<p style="margin-bottom: 12px; text-align: right; direction: rtl;">This is to certify that Mr. Muhammad Irfan, holder of Passport No. <strong>DZ1980573</strong> and Saudi Iqama No. <strong>2348965084</strong>, is the 100% owner of <strong>Amazigh Alalamiyya</strong>, a company duly registered in the Kingdom of Saudi Arabia under Commercial Registration (CR) No. <strong>7033135448</strong>.</p><p style="margin-bottom: 12px; text-align: right; direction: rtl;">Mr. Muhammad Irfan currently holds the position of <strong>Chief Executive</strong> and is actively involved in the management and day-to-day operations of the company. He is responsible for the overall management, business development, administration, and strategic affairs of the company.</p><p style="margin-bottom: 12px; text-align: right; direction: rtl;">(His current monthly income from the company is <strong>SAR 42,000 (Forty-Two Thousand Saudi Riyals</strong>).</p><p style="margin-bottom: 12px; text-align: right; direction: rtl;">We further confirm that Mr. Muhammad Irfan is a Saudi Premium Resident and is legally residing in the Kingdom of Saudi Arabia.</p><p style="margin-bottom: 12px; text-align: right; direction: rtl;">Mr. Muhammad Irfan intends to travel to the <strong>Czech Republic</strong> from 16 October 2026 to 26 October 2026 for <strong>tourism purposes</strong>. His temporary absence during this period has been approved, and he is expected to return to the Kingdom of Saudi Arabia after completing his planned trip to resume his business responsibilities and continue managing the company.</p><p style="margin-bottom: 12px; text-align: right; direction: rtl;">This certificate is issued upon his request in support of his Czech Republic Schengen Tourist Visa application.</p><p style="margin-bottom: 16px; text-align: right; direction: rtl;">Should you require any further information or verification regarding his company ownership, position, or income, please do not hesitate to contact us.</p>`
+  };
 
-  const [formData, setFormData] = useState({
+  const template1SchengenSample = {
     companyNameAr: 'نقليات حسين مهدي ال صلاح',
     companyNameEn: 'Hussein Mahdi Al Salah Transport',
     applicantNameAr: 'حسين مهدي',
@@ -36,8 +62,10 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
     destinationCountry: 'Portugal',
     travelPurpose: 'tourism purpose',
     ceoTitle: 'Chief Executive Officer (CEO)',
-    paragraph1Html: defaultDescriptionHtml
-  });
+    paragraph1Html: `<p style="margin-bottom: 16px; text-align: justify;">This is certified that Mr. <strong>MD SALAUDDIN</strong>, <strong>Bangladeshi</strong> nationality holding passport number <strong>A07950686</strong>, Saudi Arabia resident permit (IQAMA) number <strong>2584923581</strong>, is working as a <strong>General Manager</strong> in <strong>Hussein Mahdi Al Salah Transport</strong>. And he is a senior employee in our company from <strong>January 2014</strong>. And he draws a net monthly salary gross <strong>12,500 SR (twelve thousand five hundred saudi riyals only)</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.</p><p style="margin-bottom: 16px; text-align: justify;">Mr. <strong>MD SALAUDDIN</strong> wants to visit the most beautiful schengen country <strong>Portugal</strong> for <strong>tourism purpose</strong>. We further attested that we do not have any objections if he goes to <strong>Portugal</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.</p>`
+  };
+
+  const [formData, setFormData] = useState(template2CzechSample);
 
   const [generating, setGenerating] = useState(false);
   const [generatedDoc, setGeneratedDoc] = useState(null);
@@ -199,6 +227,27 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                   <span>{autoTranslate ? 'EN→AR On' : 'EN→AR Off'}</span>
                 </button>
               </div>
+            </div>
+
+            {/* Preset Template Switcher Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.85rem', background: 'var(--bg-input)', padding: '0.35rem 0.5rem', borderRadius: '8px', border: '1px solid var(--border-color)', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', marginRight: '4px' }}>Preset Sample Templates:</span>
+              <button
+                type="button"
+                onClick={() => { setFormData(template2CzechSample); setLayoutMode('rtl'); }}
+                className={`builder-tab-btn ${formData.subscriberId === '501815' ? 'active' : ''}`}
+                style={{ padding: '0.25rem 0.55rem', fontSize: '0.75rem' }}
+              >
+                Sample A (Czech Owner Executive Visa)
+              </button>
+              <button
+                type="button"
+                onClick={() => { setFormData(template1SchengenSample); setLayoutMode('ltr'); }}
+                className={`builder-tab-btn ${formData.subscriberId === '587989' ? 'active' : ''}`}
+                style={{ padding: '0.25rem 0.55rem', fontSize: '0.75rem' }}
+              >
+                Sample B (Portugal General Manager NOC)
+              </button>
             </div>
 
             {/* Form Navigation Tabs */}
@@ -504,6 +553,27 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                 <span style={{ fontWeight: '600' }}>Realtime Live Document Preview</span>
               </div>
 
+              {/* Layout Alignment Mode Switcher */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', padding: '2px 6px', marginRight: '0.5rem' }}>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginRight: '2px' }}>Layout Mode:</span>
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode('rtl')}
+                  style={{ background: layoutMode === 'rtl' ? '#3b82f6' : 'transparent', border: 'none', color: '#fff', borderRadius: '4px', cursor: 'pointer', padding: '2px 6px', fontSize: '0.72rem', fontWeight: '700' }}
+                  title="RTL Arabic Alignment Layout (As shown in sample PDF)"
+                >
+                  RTL Alignment (Sample)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode('ltr')}
+                  style={{ background: layoutMode === 'ltr' ? '#3b82f6' : 'transparent', border: 'none', color: '#fff', borderRadius: '4px', cursor: 'pointer', padding: '2px 6px', fontSize: '0.72rem', fontWeight: '700' }}
+                  title="Standard LTR English Layout"
+                >
+                  LTR Standard
+                </button>
+              </div>
+
               {/* Zoom & Scaling Controls */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', padding: '2px 6px' }}>
                 <button
@@ -555,7 +625,7 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                 maxWidth: '794px'
               }}
             >
-              <JeddahChamberDoc data={formData} isPreview={true} />
+              <JeddahChamberDoc data={formData} isPreview={true} layoutMode={layoutMode} />
             </div>
           </div>
         </div>
