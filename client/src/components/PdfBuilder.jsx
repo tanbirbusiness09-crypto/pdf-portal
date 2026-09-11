@@ -1,12 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { Sparkles, CheckCircle2, Copy, Check, ExternalLink, ArrowRight, FileText, Edit3, Building, User, FileCode, ZoomIn, ZoomOut, Maximize, RotateCcw } from 'lucide-react';
+import { Sparkles, CheckCircle2, Copy, Check, ExternalLink, ArrowRight, FileText, Edit3, Building, User, FileCode, ZoomIn, ZoomOut, Maximize, RotateCcw, Dices, RefreshCw, Languages } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import JeddahChamberDoc from './JeddahChamberDoc';
 import VisualEditor from './VisualEditor';
+import { translateEnToAr } from '../utils/arabicTranslate';
 
 export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
   const [activeFormTab, setActiveFormTab] = useState('description');
   const [zoomLevel, setZoomLevel] = useState(80);
+  const [autoTranslate, setAutoTranslate] = useState(true);
 
   const defaultDescriptionHtml = `<p style="margin-bottom: 16px; text-align: justify;">This is certified that Mr. <strong>MD SALAUDDIN</strong>, <strong>Bangladeshi</strong> nationality holding passport number <strong>A07950686</strong>, Saudi Arabia resident permit (IQAMA) number <strong>2584923581</strong>, is working as a <strong>General Manager</strong> in <strong>Hussein Mahdi Al Salah Transport</strong>. And he is a senior employee in our company from <strong>January 2014</strong>. And he draws a net monthly salary gross <strong>12,500 SR (twelve thousand five hundred saudi riyals only)</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.</p><p style="margin-bottom: 16px; text-align: justify;">Mr. <strong>MD SALAUDDIN</strong> wants to visit the most beautiful schengen country <strong>Portugal</strong> for <strong>tourism purpose</strong>. We further attested that we do not have any objections if he goes to <strong>Portugal</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.</p>`;
 
@@ -14,7 +16,7 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
     companyNameAr: 'نقليات حسين مهدي ال صلاح',
     companyNameEn: 'Hussein Mahdi Al Salah Transport',
     applicantNameAr: 'حسين مهدي',
-    applicantNameEn: 'حسين مهدي',
+    applicantNameEn: 'Hussein Mahdi',
     subscriberId: '587989',
     unifiedNo: '7021367318',
     crNo: '4030192940',
@@ -37,14 +39,74 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
     paragraph1Html: defaultDescriptionHtml
   });
 
-  const [generating, setGenerating] = useState(false);
-  const [generatedDoc, setGeneratedDoc] = useState(null);
-  const [copied, setCopied] = useState(false);
-  const [error, setError] = useState('');
+  const getRandomNum = (min, max) => Math.floor(min + Math.random() * (max - min)).toString();
+
+  const generateSingleField = (fieldName) => {
+    let val = '';
+    switch (fieldName) {
+      case 'subscriberId':
+        val = getRandomNum(100000, 999999);
+        break;
+      case 'unifiedNo':
+        val = '702' + getRandomNum(1000007, 9999999);
+        break;
+      case 'crNo':
+        val = '403' + getRandomNum(1000007, 9999999);
+        break;
+      case 'requestNo':
+        val = getRandomNum(10000000, 99999999);
+        break;
+      case 'employeeId':
+        val = getRandomNum(1000, 9999);
+        break;
+      case 'passportNo':
+        val = String.fromCharCode(65 + Math.floor(Math.random() * 26)) + getRandomNum(10000000, 99999999);
+        break;
+      case 'iqamaNo':
+        val = '25' + getRandomNum(10000000, 99999999);
+        break;
+      default:
+        break;
+    }
+    if (val) {
+      setFormData(prev => ({ ...prev, [fieldName]: val }));
+    }
+  };
+
+  const handleRandomizeAll = () => {
+    setFormData(prev => ({
+      ...prev,
+      subscriberId: getRandomNum(100000, 999999),
+      unifiedNo: '702' + getRandomNum(1000007, 9999999),
+      crNo: '403' + getRandomNum(1000007, 9999999),
+      requestNo: getRandomNum(10000000, 99999999),
+      employeeId: getRandomNum(1000, 9999),
+      passportNo: String.fromCharCode(65 + Math.floor(Math.random() * 26)) + getRandomNum(10000000, 99999999),
+      iqamaNo: '25' + getRandomNum(10000000, 99999999)
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Auto translate company and applicant names from English to Arabic if autoTranslate is active
+    if (autoTranslate && name === 'companyNameEn') {
+      const arTranslation = translateEnToAr(value);
+      setFormData(prev => ({
+        ...prev,
+        companyNameEn: value,
+        companyNameAr: arTranslation || prev.companyNameAr
+      }));
+    } else if (autoTranslate && name === 'applicantNameEn') {
+      const arTranslation = translateEnToAr(value);
+      setFormData(prev => ({
+        ...prev,
+        applicantNameEn: value,
+        applicantNameAr: arTranslation || prev.applicantNameAr
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleDescriptionChange = (newHtml) => {
@@ -97,19 +159,45 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
       {!generatedDoc ? (
         <div className="builder-viewport">
           {/* Left Column: Form Controls (Fixed Viewport Scrollable) */}
-          <div className="glass-panel builder-form-scroll" style={{ padding: '1.25rem' }}>
-            <div style={{ marginBottom: '0.85rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.65rem' }}>
-              <h2 style={{ fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                <Sparkles size={18} color="#3b82f6" />
-                <span>Document Form Controls</span>
-              </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-                Edit document text and fields naturally using the MS Word style Visual Editor.
-              </p>
+          <div className="glass-panel builder-form-scroll" style={{ padding: '1.1rem' }}>
+            <div style={{ marginBottom: '0.85rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <div>
+                <h2 style={{ fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.15rem' }}>
+                  <Sparkles size={18} color="#3b82f6" />
+                  <span>Document Form Controls</span>
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                  Natural editor, live transliteration & 1-click generators.
+                </p>
+              </div>
+
+              {/* Action Toolbar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <button
+                  type="button"
+                  onClick={handleRandomizeAll}
+                  className="btn btn-secondary"
+                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem', gap: '0.3rem' }}
+                  title="Randomize All Numeric & ID Credentials"
+                >
+                  <Dices size={14} color="#3b82f6" />
+                  <span>Randomize All</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAutoTranslate(!autoTranslate)}
+                  className={`btn ${autoTranslate ? 'btn-emerald' : 'btn-secondary'}`}
+                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem', gap: '0.3rem' }}
+                  title="Toggle English to Arabic Auto-Transliteration"
+                >
+                  <Languages size={14} />
+                  <span>{autoTranslate ? 'EN→AR On' : 'EN→AR Off'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Form Navigation Tabs */}
-            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '1.1rem' }}>
+            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
               <button
                 type="button"
                 className={`builder-tab-btn ${activeFormTab === 'description' ? 'active' : ''}`}
@@ -187,45 +275,72 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
               {/* TAB 2: HEADER & COMPANY INFO */}
               {activeFormTab === 'company' && (
                 <div>
-                  <h4 style={{ fontSize: '0.88rem', color: 'var(--accent-cyan)', marginBottom: '0.75rem' }}>Header & Company Info</h4>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <h4 style={{ fontSize: '0.88rem', color: 'var(--accent-cyan)' }}>Header & Company Info</h4>
+                    {autoTranslate && (
+                      <span style={{ fontSize: '0.72rem', color: '#10b981', background: 'rgba(16,185,129,0.1)', padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(16,185,129,0.2)' }}>
+                        ✓ EN → AR Auto-Transliteration Active
+                      </span>
+                    )}
+                  </div>
                   
                   <div className="form-group">
-                    <label className="form-label">Company Name (Arabic)</label>
+                    <label className="form-label">Company Name (English)</label>
+                    <input type="text" className="form-input" name="companyNameEn" value={formData.companyNameEn} onChange={handleChange} placeholder="e.g. Hussein Mahdi Al Salah Transport" />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Company Name (Arabic - Auto Translated)</label>
                     <input type="text" className="form-input" name="companyNameAr" value={formData.companyNameAr} onChange={handleChange} dir="rtl" />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Company Name (English)</label>
-                    <input type="text" className="form-input" name="companyNameEn" value={formData.companyNameEn} onChange={handleChange} />
-                  </div>
-
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                    <div className="form-group">
-                      <label className="form-label">Applicant (Arabic)</label>
-                      <input type="text" className="form-input" name="applicantNameAr" value={formData.applicantNameAr} onChange={handleChange} dir="rtl" />
-                    </div>
                     <div className="form-group">
                       <label className="form-label">Applicant (English)</label>
                       <input type="text" className="form-input" name="applicantNameEn" value={formData.applicantNameEn} onChange={handleChange} />
                     </div>
+                    <div className="form-group">
+                      <label className="form-label">Applicant (Arabic)</label>
+                      <input type="text" className="form-input" name="applicantNameAr" value={formData.applicantNameAr} onChange={handleChange} dir="rtl" />
+                    </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                     <div className="form-group">
-                      <label className="form-label">Subscriber ID</label>
+                      <div className="field-label-row">
+                        <label className="form-label">Subscriber ID</label>
+                        <button type="button" className="gen-btn" onClick={() => generateSingleField('subscriberId')} title="Auto-Generate 6-digit Subscriber ID">
+                          <Sparkles size={11} />
+                          <span>Gen</span>
+                        </button>
+                      </div>
                       <input type="text" className="form-input" name="subscriberId" value={formData.subscriberId} onChange={handleChange} />
                     </div>
+
                     <div className="form-group">
-                      <label className="form-label">Unified Number</label>
+                      <div className="field-label-row">
+                        <label className="form-label">Unified Number</label>
+                        <button type="button" className="gen-btn" onClick={() => generateSingleField('unifiedNo')} title="Auto-Generate 10-digit Unified Number">
+                          <Sparkles size={11} />
+                          <span>Gen</span>
+                        </button>
+                      </div>
                       <input type="text" className="form-input" name="unifiedNo" value={formData.unifiedNo} onChange={handleChange} />
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                     <div className="form-group">
-                      <label className="form-label">C.R Number</label>
+                      <div className="field-label-row">
+                        <label className="form-label">C.R Number</label>
+                        <button type="button" className="gen-btn" onClick={() => generateSingleField('crNo')} title="Auto-Generate C.R Number">
+                          <Sparkles size={11} />
+                          <span>Gen</span>
+                        </button>
+                      </div>
                       <input type="text" className="form-input" name="crNo" value={formData.crNo} onChange={handleChange} />
                     </div>
+
                     <div className="form-group">
                       <label className="form-label">Phone Number</label>
                       <input type="text" className="form-input" name="phoneNo" value={formData.phoneNo} onChange={handleChange} />
@@ -237,14 +352,27 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                       <label className="form-label">Issue Date</label>
                       <input type="text" className="form-input" name="docDate" value={formData.docDate} onChange={handleChange} />
                     </div>
+
                     <div className="form-group">
-                      <label className="form-label">Request Number</label>
+                      <div className="field-label-row">
+                        <label className="form-label">Request Number</label>
+                        <button type="button" className="gen-btn" onClick={() => generateSingleField('requestNo')} title="Auto-Generate Request Number">
+                          <Sparkles size={11} />
+                          <span>Gen</span>
+                        </button>
+                      </div>
                       <input type="text" className="form-input" name="requestNo" value={formData.requestNo} onChange={handleChange} />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Employee ID</label>
+                    <div className="field-label-row">
+                      <label className="form-label">Employee ID</label>
+                      <button type="button" className="gen-btn" onClick={() => generateSingleField('employeeId')} title="Auto-Generate Employee ID">
+                        <Sparkles size={11} />
+                        <span>Gen</span>
+                      </button>
+                    </div>
                     <input type="text" className="form-input" name="employeeId" value={formData.employeeId} onChange={handleChange} />
                   </div>
                 </div>
@@ -273,11 +401,24 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                     <div className="form-group">
-                      <label className="form-label">Passport Number</label>
+                      <div className="field-label-row">
+                        <label className="form-label">Passport Number</label>
+                        <button type="button" className="gen-btn" onClick={() => generateSingleField('passportNo')} title="Auto-Generate Passport Number">
+                          <Sparkles size={11} />
+                          <span>Gen</span>
+                        </button>
+                      </div>
                       <input type="text" className="form-input" name="passportNo" value={formData.passportNo} onChange={handleChange} />
                     </div>
+
                     <div className="form-group">
-                      <label className="form-label">IQAMA Number</label>
+                      <div className="field-label-row">
+                        <label className="form-label">IQAMA Number</label>
+                        <button type="button" className="gen-btn" onClick={() => generateSingleField('iqamaNo')} title="Auto-Generate IQAMA Number">
+                          <Sparkles size={11} />
+                          <span>Gen</span>
+                        </button>
+                      </div>
                       <input type="text" className="form-input" name="iqamaNo" value={formData.iqamaNo} onChange={handleChange} />
                     </div>
                   </div>
