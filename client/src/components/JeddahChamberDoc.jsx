@@ -24,7 +24,9 @@ export default function JeddahChamberDoc({ data, qrDataUrl, isPreview = false })
     monthlySalary = '12,500 SR (twelve thousand five hundred saudi riyals only)',
     destinationCountry = 'Portugal',
     travelPurpose = 'tourism purpose',
-    ceoTitle = 'Chief Executive Officer (CEO)'
+    ceoTitle = 'Chief Executive Officer (CEO)',
+    paragraph1Html,
+    paragraph2Html
   } = data || {};
 
   // Sample SVG QR Code for instant crisp live preview if qrDataUrl is not yet passed
@@ -67,7 +69,7 @@ export default function JeddahChamberDoc({ data, qrDataUrl, isPreview = false })
           </div>
         </div>
 
-        {/* Header Metadata Container Card (Matching Gray Background Box in Original Image) */}
+        {/* Header Metadata Container Card */}
         <div
           style={{
             background: '#f6f8fa',
@@ -153,13 +155,29 @@ export default function JeddahChamberDoc({ data, qrDataUrl, isPreview = false })
 
           <div style={{ marginBottom: '16px', fontWeight: '500' }}>Dear Sir/Madam,</div>
 
-          <div style={{ marginBottom: '16px', textAlign: 'justify' }}>
-            This is certified that Mr. <strong>{employeeName}</strong>, <strong>{employeeNationality}</strong> nationality holding passport number <strong>{passportNo}</strong>, Saudi Arabia resident permit (IQAMA) number <strong>{iqamaNo}</strong>, is working as a <strong>{jobTitle}</strong> in <strong>{companyNameEn}</strong>. And he is a senior employee in our company from <strong>{joiningDate}</strong>. And he draws a net monthly salary gross <strong>{monthlySalary}</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.
-          </div>
+          {/* Paragraph 1 */}
+          {paragraph1Html ? (
+            <div
+              style={{ marginBottom: '16px', textAlign: 'justify' }}
+              dangerouslySetInnerHTML={{ __html: paragraph1Html }}
+            />
+          ) : (
+            <div style={{ marginBottom: '16px', textAlign: 'justify' }}>
+              This is certified that Mr. <strong>{employeeName}</strong>, <strong>{employeeNationality}</strong> nationality holding passport number <strong>{passportNo}</strong>, Saudi Arabia resident permit (IQAMA) number <strong>{iqamaNo}</strong>, is working as a <strong>{jobTitle}</strong> in <strong>{companyNameEn}</strong>. And he is a senior employee in our company from <strong>{joiningDate}</strong>. And he draws a net monthly salary gross <strong>{monthlySalary}</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.
+            </div>
+          )}
 
-          <div style={{ marginBottom: '40px', textAlign: 'justify' }}>
-            Mr. <strong>{employeeName}</strong> wants to visit the most beautiful schengen country <strong>{destinationCountry}</strong> for <strong>{travelPurpose}</strong>. We further attested that we do not have any objections if he goes to <strong>{destinationCountry}</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.
-          </div>
+          {/* Paragraph 2 */}
+          {paragraph2Html ? (
+            <div
+              style={{ marginBottom: '40px', textAlign: 'justify' }}
+              dangerouslySetInnerHTML={{ __html: paragraph2Html }}
+            />
+          ) : (
+            <div style={{ marginBottom: '40px', textAlign: 'justify' }}>
+              Mr. <strong>{employeeName}</strong> wants to visit the most beautiful schengen country <strong>{destinationCountry}</strong> for <strong>{travelPurpose}</strong>. We further attested that we do not have any objections if he goes to <strong>{destinationCountry}</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.
+            </div>
+          )}
 
           <div style={{ marginTop: '25px' }}>
             <div>Best Regards</div>
@@ -169,7 +187,7 @@ export default function JeddahChamberDoc({ data, qrDataUrl, isPreview = false })
         </div>
       </div>
 
-      {/* Bottom Legal Disclaimer Footer (Matching Soft Gray Card Box) */}
+      {/* Bottom Legal Disclaimer Footer */}
       <div style={{ marginTop: '40px' }}>
         <div
           style={{
