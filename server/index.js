@@ -213,6 +213,145 @@ app.post('/api/pdfs/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+// Helper function to create an A4 PDF document for generated Jeddah Chamber Certificates
+async function createChamberPDFFile(chamberData, publicShareUrl) {
+  try {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595.28, 841.89]); // A4 Dimensions in points
+    const { width, height } = page.getSize();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+    // Generate QR Code Buffer
+    const qrBuffer = await QRCode.toBuffer(publicShareUrl, {
+      type: 'png',
+      width: 150,
+      margin: 1,
+      color: { dark: '#000000', light: '#ffffff' }
+    });
+    const qrImage = await pdfDoc.embedPng(qrBuffer);
+
+    // Header Logo Text
+    page.drawText('غرفة جدة JEDDAH CHAMBER — 1946 —', {
+      x: 40,
+      y: height - 45,
+      size: 14,
+      font: fontBold,
+      color: rgb(0, 0.36, 0.66)
+    });
+
+    // Header Metadata Card Box
+    page.drawRectangle({
+      x: 40,
+      y: height - 165,
+      width: width - 80,
+      height: 105,
+      color: rgb(0.96, 0.97, 0.98),
+      borderColor: rgb(0.91, 0.92, 0.93),
+      borderWidth: 1
+    });
+
+    // Left Column English Metadata
+    const leftTextY = height - 75;
+    page.drawText(chamberData.companyNameEn || 'Amazigh Alalamiyya Co.', { x: 50, y: leftTextY, size: 9, font: fontBold, color: rgb(0, 0, 0) });
+    page.drawText(`Applicant : ${chamberData.applicantNameEn || ''}`, { x: 50, y: leftTextY - 12, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`MembershipNumber: ${chamberData.subscriberId || ''}`, { x: 50, y: leftTextY - 22, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`UnifiedNumber: ${chamberData.unifiedNo || ''}`, { x: 50, y: leftTextY - 32, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`C.R : ${chamberData.crNo || ''}`, { x: 50, y: leftTextY - 42, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Phone Number : ${chamberData.phoneNo || ''}`, { x: 50, y: leftTextY - 52, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Date : ${chamberData.docDate || ''}  Request number : ${chamberData.requestNo || ''}`, { x: 50, y: leftTextY - 62, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Employee : ${chamberData.employeeId || ''}`, { x: 50, y: leftTextY - 72, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+
+    // Center QR Code Image
+    page.drawImage(qrImage, {
+      x: width / 2 - 35,
+      y: height - 155,
+      width: 70,
+      height: 70
+    });
+
+    // Right Column Metadata Details
+    const rightX = width - 210;
+    page.drawText(chamberData.companyNameAr || '', { x: rightX, y: leftTextY, size: 9, font: fontBold, color: rgb(0, 0, 0) });
+    page.drawText(`Applicant: ${chamberData.applicantNameAr || ''}`, { x: rightX, y: leftTextY - 12, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Sub ID: ${chamberData.subscriberId || ''}`, { x: rightX, y: leftTextY - 22, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Unified: ${chamberData.unifiedNo || ''}`, { x: rightX, y: leftTextY - 32, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`C.R: ${chamberData.crNo || ''}`, { x: rightX, y: leftTextY - 42, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Date: ${chamberData.docDate || ''}`, { x: rightX, y: leftTextY - 52, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Request: ${chamberData.requestNo || ''}`, { x: rightX, y: leftTextY - 62, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(`Employee: ${chamberData.employeeId || ''}`, { x: rightX, y: leftTextY - 72, size: 8, font, color: rgb(0.2, 0.2, 0.2) });
+
+    // Recipient Header
+    let bodyY = height - 195;
+    page.drawText(`:TO`, { x: 50, y: bodyY, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(`${chamberData.embassyName || ''}`, { x: 50, y: bodyY - 14, size: 9, font, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(`${chamberData.embassyCity || ''}`, { x: 50, y: bodyY - 26, size: 9, font, color: rgb(0.1, 0.1, 0.1) });
+
+    // Clean body HTML tags for PDF line drawing
+    bodyY -= 55;
+    const cleanText = (chamberData.paragraph1Html || '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const words = cleanText.split(' ');
+    let currentLine = '';
+    for (let word of words) {
+      if ((currentLine + word).length > 80) {
+        page.drawText(currentLine, { x: 50, y: bodyY, size: 9, font, color: rgb(0.15, 0.15, 0.15) });
+        bodyY -= 14;
+        currentLine = word + ' ';
+      } else {
+        currentLine += word + ' ';
+      }
+    }
+    if (currentLine) {
+      page.drawText(currentLine, { x: 50, y: bodyY, size: 9, font, color: rgb(0.15, 0.15, 0.15) });
+      bodyY -= 20;
+    }
+
+    // Sign-off Block
+    bodyY -= 20;
+    page.drawText(`,Sincerely`, { x: 50, y: bodyY, size: 9, font, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(`Mr. ${chamberData.employeeName || ''}`, { x: 50, y: bodyY - 14, size: 9, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(`${chamberData.ceoTitle || 'Chief Executive'}`, { x: 50, y: bodyY - 26, size: 9, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(`${chamberData.companyNameEn || ''}`, { x: 50, y: bodyY - 38, size: 9, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
+
+    // Footer Disclaimer Box
+    page.drawRectangle({
+      x: 40,
+      y: 40,
+      width: width - 80,
+      height: 35,
+      color: rgb(0.96, 0.97, 0.98),
+      borderColor: rgb(0.91, 0.92, 0.93),
+      borderWidth: 1
+    });
+
+    page.drawText('https://es.jcci.org.sa/Home - Jeddah Chamber Official Portal Attestation', {
+      x: 50,
+      y: 53,
+      size: 8,
+      font,
+      color: rgb(0, 0.36, 0.66)
+    });
+
+    page.drawText('Page 1 of 1', {
+      x: width - 95,
+      y: 25,
+      size: 8,
+      font: fontBold,
+      color: rgb(0.3, 0.3, 0.3)
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    return Buffer.from(pdfBytes);
+  } catch (err) {
+    console.error('Error generating PDF file:', err);
+    return null;
+  }
+}
+
 // 4. Generate custom Jeddah Chamber Certificate PDF
 app.post('/api/pdfs/generate', async (req, res) => {
   try {
@@ -223,6 +362,12 @@ app.post('/api/pdfs/generate', async (req, res) => {
     const publicShareUrl = `${clientUrl}/view/${docId}`;
     const filename = `generated_${Date.now()}_${docId}.pdf`;
     const filePath = path.join(UPLOADS_DIR, filename);
+
+    // Create and save actual PDF file to disk
+    const pdfBuffer = await createChamberPDFFile(chamberData || {}, publicShareUrl);
+    if (pdfBuffer) {
+      fs.writeFileSync(filePath, pdfBuffer);
+    }
 
     const qrDataUrl = await QRCode.toDataURL(publicShareUrl, { margin: 1, width: 250 });
 

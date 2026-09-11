@@ -198,7 +198,7 @@ export default function CustomerViewer({ docId }) {
         >
           {isChamberDoc && pdf.chamberData ? (
             <div className="print-area">
-              <JeddahChamberDoc data={pdf.chamberData} qrDataUrl={pdf.qrDataUrl} />
+              <JeddahChamberDoc data={pdf.chamberData} qrDataUrl={pdf.qrDataUrl} layoutMode={pdf.chamberData?.layoutMode || 'rtl'} />
             </div>
           ) : (
             <iframe

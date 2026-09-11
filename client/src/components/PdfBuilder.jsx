@@ -161,7 +161,10 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: `Jeddah Chamber Certificate - ${formData.employeeName}`,
-          chamberData: formData
+          chamberData: {
+            ...formData,
+            layoutMode
+          }
         })
       });
 
