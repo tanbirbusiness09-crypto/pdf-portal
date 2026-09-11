@@ -182,7 +182,7 @@ export default function CustomerViewer({ docId }) {
 
       {/* Instruction Notice */}
       <div className="no-print" style={{ background: 'rgba(59, 130, 246, 0.1)', borderBottom: '1px solid rgba(59, 130, 246, 0.2)', padding: '0.5rem 1.5rem', fontSize: '0.85rem', textAlign: 'center', color: '#93c5fd' }}>
-        💡 নিচে ডক্যুমেন্টটি সরাসরি দেখা যাচ্ছে। আপনি চাইলে <strong>Save PDF</strong> বাটনে ক্লিক করে ডেক্সটপ/মোবাইলে সেভ অথবা <strong>Print PDF</strong> দিয়ে সরাসরি প্রিন্ট করতে পারেন।
+        💡 You can view the verified document directly below. Click <strong>Save PDF</strong> to download or <strong>Print PDF</strong> to print immediately.
       </div>
 
       {/* Main Document Embed Container */}

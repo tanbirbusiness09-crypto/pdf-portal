@@ -73,7 +73,7 @@ export default function PdfUploader({ onUploadSuccess, setActiveTab }) {
       <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
         <h1 style={{ fontSize: '1.75rem', marginBottom: '0.35rem' }}>Upload Existing PDF</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          যেকোনো পিডিএফ ফাইল আপলোড করুন, অটোমেটিক QR Code স্ট্যাম্প এবং কাস্টমার শেয়ারিং লিংক তৈরি হবে
+          Upload any PDF document to automatically embed verification QR codes and generate shareable links.
         </p>
       </div>
 
@@ -205,7 +205,7 @@ export default function PdfUploader({ onUploadSuccess, setActiveTab }) {
 
           <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>PDF Uploaded & Stamped!</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
-            আপনার পিডিএফ সফলভাবে আপলোড হয়েছে এবং QR Code যুক্ত করা হয়েছে।
+            Your PDF document has been uploaded successfully with embedded QR verification.
           </p>
 
           {/* QR Code & Link Preview */}

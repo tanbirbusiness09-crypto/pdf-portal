@@ -6,7 +6,7 @@ import VisualEditor from './VisualEditor';
 
 export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
   const [activeFormTab, setActiveFormTab] = useState('description');
-  const [zoomLevel, setZoomLevel] = useState(100); // Zoom scale percentage for preview
+  const [zoomLevel, setZoomLevel] = useState(100);
 
   const defaultDescriptionHtml = `<p style="margin-bottom: 16px; text-align: justify;">This is certified that Mr. <strong>MD SALAUDDIN</strong>, <strong>Bangladeshi</strong> nationality holding passport number <strong>A07950686</strong>, Saudi Arabia resident permit (IQAMA) number <strong>2584923581</strong>, is working as a <strong>General Manager</strong> in <strong>Hussein Mahdi Al Salah Transport</strong>. And he is a senior employee in our company from <strong>January 2014</strong>. And he draws a net monthly salary gross <strong>12,500 SR (twelve thousand five hundred saudi riyals only)</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.</p><p style="margin-bottom: 16px; text-align: justify;">Mr. <strong>MD SALAUDDIN</strong> wants to visit the most beautiful schengen country <strong>Portugal</strong> for <strong>tourism purpose</strong>. We further attested that we do not have any objections if he goes to <strong>Portugal</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.</p>`;
 
@@ -94,6 +94,15 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
 
   return (
     <div style={{ width: '100%' }}>
+      <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '1.75rem', marginBottom: '0.35rem' }}>
+          Jeddah Chamber Certificate Builder (غرفة جدة)
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+          Official Jeddah Chamber of Commerce NOC & Salary Certificate Layout
+        </p>
+      </div>
+
       {!generatedDoc ? (
         <div className="builder-viewport">
           {/* Left Column: Form Controls (Fixed Viewport Scrollable) */}
@@ -104,7 +113,7 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                 <span>Document Form Controls</span>
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                MS Word এর মতো ভিজ্যুয়াল এডিটরে ডকুমেন্টের বিবরণি এডিট করুন
+                Edit document text and fields naturally using the MS Word style Visual Editor.
               </p>
             </div>
 
@@ -172,7 +181,7 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                       Visual Description Editor (MS Word Style)
                     </h4>
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                      কোনো HTML ট্যাগ ছাড়াই স্বাচ্ছন্দ্যে টাইপ করুন। টেক্সট সিলেক্ট করে Bold, Italic বা Underline করুন।
+                      Type naturally without raw HTML code. Highlight text to apply Bold, Italic, or Underline formatting.
                     </p>
                   </div>
 
@@ -426,7 +435,7 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
 
           <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Jeddah Chamber Certificate Created!</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
-            আপনার পিডিএফটি হুবহু অরিজিনাল ডিজাইনে তৈরি হয়ে গেছে এবং এতে অটোমেটিক QR Code যোগ করা হয়েছে।
+            Your PDF document has been generated in official layout with embedded verification QR code.
           </p>
 
           <div
