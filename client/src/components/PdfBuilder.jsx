@@ -6,7 +6,7 @@ import VisualEditor from './VisualEditor';
 
 export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
   const [activeFormTab, setActiveFormTab] = useState('description');
-  const [zoomLevel, setZoomLevel] = useState(100);
+  const [zoomLevel, setZoomLevel] = useState(80);
 
   const defaultDescriptionHtml = `<p style="margin-bottom: 16px; text-align: justify;">This is certified that Mr. <strong>MD SALAUDDIN</strong>, <strong>Bangladeshi</strong> nationality holding passport number <strong>A07950686</strong>, Saudi Arabia resident permit (IQAMA) number <strong>2584923581</strong>, is working as a <strong>General Manager</strong> in <strong>Hussein Mahdi Al Salah Transport</strong>. And he is a senior employee in our company from <strong>January 2014</strong>. And he draws a net monthly salary gross <strong>12,500 SR (twelve thousand five hundred saudi riyals only)</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.</p><p style="margin-bottom: 16px; text-align: justify;">Mr. <strong>MD SALAUDDIN</strong> wants to visit the most beautiful schengen country <strong>Portugal</strong> for <strong>tourism purpose</strong>. We further attested that we do not have any objections if he goes to <strong>Portugal</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.</p>`;
 
@@ -381,12 +381,20 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setZoomLevel(100)}
-                  style={{ background: 'transparent', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: '2px 4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '2px' }}
-                  title="Auto Fit 100%"
+                  onClick={() => setZoomLevel(80)}
+                  style={{ background: 'transparent', border: 'none', color: zoomLevel === 80 ? '#3b82f6' : '#60a5fa', cursor: 'pointer', padding: '2px 4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '2px' }}
+                  title="Fit Page 80%"
                 >
                   <Maximize size={12} />
-                  <span>Fit</span>
+                  <span>Fit (80%)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoomLevel(100)}
+                  style={{ background: 'transparent', border: 'none', color: zoomLevel === 100 ? '#3b82f6' : '#94a3b8', cursor: 'pointer', padding: '2px 4px', fontSize: '0.75rem' }}
+                  title="Actual Size 100%"
+                >
+                  <span>100%</span>
                 </button>
               </div>
             </div>
