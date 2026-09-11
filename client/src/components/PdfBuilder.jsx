@@ -1,14 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { Sparkles, CheckCircle2, Copy, Check, ExternalLink, ArrowRight, FileText, Bold, Italic, Underline, RotateCcw, Edit3, Building, User, FileCode } from 'lucide-react';
+import { Sparkles, CheckCircle2, Copy, Check, ExternalLink, ArrowRight, FileText, Edit3, Building, User, FileCode, ZoomIn, ZoomOut, Maximize, RotateCcw } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import JeddahChamberDoc from './JeddahChamberDoc';
+import VisualEditor from './VisualEditor';
 
 export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
-  const [activeFormTab, setActiveFormTab] = useState('description'); // Default to description editor as requested
+  const [activeFormTab, setActiveFormTab] = useState('description');
+  const [zoomLevel, setZoomLevel] = useState(100); // Zoom scale percentage for preview
 
-  const defaultP1 = `This is certified that Mr. <strong>MD SALAUDDIN</strong>, <strong>Bangladeshi</strong> nationality holding passport number <strong>A07950686</strong>, Saudi Arabia resident permit (IQAMA) number <strong>2584923581</strong>, is working as a <strong>General Manager</strong> in <strong>Hussein Mahdi Al Salah Transport</strong>. And he is a senior employee in our company from <strong>January 2014</strong>. And he draws a net monthly salary gross <strong>12,500 SR (twelve thousand five hundred saudi riyals only)</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.`;
-
-  const defaultP2 = `Mr. <strong>MD SALAUDDIN</strong> wants to visit the most beautiful schengen country <strong>Portugal</strong> for <strong>tourism purpose</strong>. We further attested that we do not have any objections if he goes to <strong>Portugal</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.`;
+  const defaultDescriptionHtml = `<p style="margin-bottom: 16px; text-align: justify;">This is certified that Mr. <strong>MD SALAUDDIN</strong>, <strong>Bangladeshi</strong> nationality holding passport number <strong>A07950686</strong>, Saudi Arabia resident permit (IQAMA) number <strong>2584923581</strong>, is working as a <strong>General Manager</strong> in <strong>Hussein Mahdi Al Salah Transport</strong>. And he is a senior employee in our company from <strong>January 2014</strong>. And he draws a net monthly salary gross <strong>12,500 SR (twelve thousand five hundred saudi riyals only)</strong> with extra facilities from our company. His contract and iqama are renewable in every year by the company.</p><p style="margin-bottom: 16px; text-align: justify;">Mr. <strong>MD SALAUDDIN</strong> wants to visit the most beautiful schengen country <strong>Portugal</strong> for <strong>tourism purpose</strong>. We further attested that we do not have any objections if he goes to <strong>Portugal</strong> to enjoy his vacation. Upon completion of his travel and duration of stay, he will return and resume his work with us. If you have any quarries, please feel free to contract with us.</p>`;
 
   const [formData, setFormData] = useState({
     companyNameAr: 'نقليات حسين مهدي ال صلاح',
@@ -34,45 +34,25 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
     destinationCountry: 'Portugal',
     travelPurpose: 'tourism purpose',
     ceoTitle: 'Chief Executive Officer (CEO)',
-    paragraph1Html: defaultP1,
-    paragraph2Html: defaultP2
+    paragraph1Html: defaultDescriptionHtml
   });
 
   const [generating, setGenerating] = useState(false);
   const [generatedDoc, setGeneratedDoc] = useState(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
-  const p1Ref = useRef(null);
-  const p2Ref = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Format selected text in Paragraph 1 or Paragraph 2
-  const applyFormat = (targetField, tag) => {
-    const textarea = targetField === 'paragraph1Html' ? p1Ref.current : p2Ref.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const currentText = formData[targetField];
-
-    if (start !== end) {
-      const selectedText = currentText.substring(start, end);
-      const replacement = `<${tag}>${selectedText}</${tag}>`;
-      const newText = currentText.substring(0, start) + replacement + currentText.substring(end);
-      setFormData(prev => ({ ...prev, [targetField]: newText }));
-    }
+  const handleDescriptionChange = (newHtml) => {
+    setFormData(prev => ({ ...prev, paragraph1Html: newHtml }));
   };
 
   const handleResetDescription = () => {
-    setFormData(prev => ({
-      ...prev,
-      paragraph1Html: defaultP1,
-      paragraph2Html: defaultP2
-    }));
+    setFormData(prev => ({ ...prev, paragraph1Html: defaultDescriptionHtml }));
   };
 
   const handleSubmit = async (e) => {
@@ -116,7 +96,7 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
     <div style={{ width: '100%' }}>
       {!generatedDoc ? (
         <div className="builder-viewport">
-          {/* Left Column: Form Inputs with Accordion / Tabs (Fixed Height Scrollable) */}
+          {/* Left Column: Form Controls (Fixed Viewport Scrollable) */}
           <div className="glass-panel builder-form-scroll" style={{ padding: '1.25rem' }}>
             <div style={{ marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
               <h2 style={{ fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
@@ -124,11 +104,11 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                 <span>Document Form Controls</span>
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                হুবহু সৌদি চেম্বার পেপারের তথ্য ও ডিসক্রিপশন টেক্সট কাস্টমাইজ করুন
+                MS Word এর মতো ভিজ্যুয়াল এডিটরে ডকুমেন্টের বিবরণি এডিট করুন
               </p>
             </div>
 
-            {/* Form Section Navigation Tabs */}
+            {/* Form Navigation Tabs */}
             <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
               <button
                 type="button"
@@ -136,7 +116,7 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
                 onClick={() => setActiveFormTab('description')}
               >
                 <Edit3 size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                <span>Description Editor</span>
+                <span>Visual Description Editor</span>
               </button>
 
               <button
@@ -184,81 +164,23 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
             )}
 
             <form onSubmit={handleSubmit}>
-              {/* TAB 1: DESCRIPTION & RICH TEXT EDITOR */}
+              {/* TAB 1: MS WORD STYLE VISUAL DESCRIPTION EDITOR */}
               {activeFormTab === 'description' && (
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                    <h4 style={{ fontSize: '0.88rem', color: 'var(--primary)', margin: 0 }}>
-                      Letter Description & Rich Content Editor
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <h4 style={{ fontSize: '0.88rem', color: 'var(--primary)', marginBottom: '0.35rem' }}>
+                      Visual Description Editor (MS Word Style)
                     </h4>
-                    <button
-                      type="button"
-                      onClick={handleResetDescription}
-                      className="btn btn-secondary"
-                      style={{ padding: '0.25rem 0.55rem', fontSize: '0.75rem' }}
-                      title="Reset to Original Jeddah Chamber Text"
-                    >
-                      <RotateCcw size={12} />
-                      <span>Reset Original</span>
-                    </button>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      কোনো HTML ট্যাগ ছাড়াই স্বাচ্ছন্দ্যে টাইপ করুন। টেক্সট সিলেক্ট করে Bold, Italic বা Underline করুন।
+                    </p>
                   </div>
 
-                  {/* Paragraph 1 Editor */}
-                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label className="form-label">Paragraph 1 (Certification & Salary Details)</label>
-                      <div className="editor-toolbar">
-                        <button type="button" className="editor-btn" onClick={() => applyFormat('paragraph1Html', 'strong')} title="Bold">
-                          <Bold size={13} />
-                        </button>
-                        <button type="button" className="editor-btn" onClick={() => applyFormat('paragraph1Html', 'em')} title="Italic">
-                          <Italic size={13} />
-                        </button>
-                        <button type="button" className="editor-btn" onClick={() => applyFormat('paragraph1Html', 'u')} title="Underline">
-                          <Underline size={13} />
-                        </button>
-                      </div>
-                    </div>
-                    <textarea
-                      ref={p1Ref}
-                      name="paragraph1Html"
-                      rows="6"
-                      className="form-textarea"
-                      style={{ fontSize: '0.85rem', lineHeight: '1.5', fontFamily: 'monospace' }}
-                      value={formData.paragraph1Html}
-                      onChange={handleChange}
-                    ></textarea>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      💡 Select text and click <strong>B</strong> or <em>I</em> to format. HTML tags like &lt;strong&gt; render directly in preview.
-                    </span>
-                  </div>
-
-                  {/* Paragraph 2 Editor */}
-                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label className="form-label">Paragraph 2 (Travel Purpose & No Objection)</label>
-                      <div className="editor-toolbar">
-                        <button type="button" className="editor-btn" onClick={() => applyFormat('paragraph2Html', 'strong')} title="Bold">
-                          <Bold size={13} />
-                        </button>
-                        <button type="button" className="editor-btn" onClick={() => applyFormat('paragraph2Html', 'em')} title="Italic">
-                          <Italic size={13} />
-                        </button>
-                        <button type="button" className="editor-btn" onClick={() => applyFormat('paragraph2Html', 'u')} title="Underline">
-                          <Underline size={13} />
-                        </button>
-                      </div>
-                    </div>
-                    <textarea
-                      ref={p2Ref}
-                      name="paragraph2Html"
-                      rows="5"
-                      className="form-textarea"
-                      style={{ fontSize: '0.85rem', lineHeight: '1.5', fontFamily: 'monospace' }}
-                      value={formData.paragraph2Html}
-                      onChange={handleChange}
-                    ></textarea>
-                  </div>
+                  <VisualEditor
+                    value={formData.paragraph1Html}
+                    onChange={handleDescriptionChange}
+                    onReset={handleResetDescription}
+                  />
                 </div>
               )}
 
@@ -416,9 +338,71 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
             </form>
           </div>
 
-          {/* Right Column: 100% Realtime Live Document Preview (Fixed Viewport) */}
+          {/* Right Column: Realtime A4 Document Preview with Zoom / Auto-Scale Toolbar */}
           <div className="builder-preview-scroll">
-            <JeddahChamberDoc data={formData} isPreview={true} />
+            {/* Preview Toolbar */}
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '794px',
+                marginBottom: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                color: '#fff',
+                fontSize: '0.85rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <FileText size={16} color="#3b82f6" />
+                <span style={{ fontWeight: '600' }}>Realtime Live Document Preview</span>
+              </div>
+
+              {/* Zoom & Scaling Controls */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', padding: '2px 6px' }}>
+                <button
+                  type="button"
+                  onClick={() => setZoomLevel(prev => Math.max(50, prev - 10))}
+                  style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '2px 4px' }}
+                  title="Zoom Out"
+                >
+                  <ZoomOut size={14} />
+                </button>
+                <span style={{ fontSize: '0.78rem', fontWeight: '600', minWidth: '35px', textAlign: 'center' }}>
+                  {zoomLevel}%
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setZoomLevel(prev => Math.min(130, prev + 10))}
+                  style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '2px 4px' }}
+                  title="Zoom In"
+                >
+                  <ZoomIn size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoomLevel(100)}
+                  style={{ background: 'transparent', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: '2px 4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '2px' }}
+                  title="Auto Fit 100%"
+                >
+                  <Maximize size={12} />
+                  <span>Fit</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Scaled A4 Document */}
+            <div
+              style={{
+                transform: `scale(${zoomLevel / 100})`,
+                transformOrigin: 'top center',
+                transition: 'transform 0.2s ease',
+                width: '100%',
+                maxWidth: '794px'
+              }}
+            >
+              <JeddahChamberDoc data={formData} isPreview={true} />
+            </div>
           </div>
         </div>
       ) : (

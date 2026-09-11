@@ -3,33 +3,33 @@
   --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
 
   /* Default Dark Theme Variables */
-  --bg-dark: #090d16;
-  --bg-card: rgba(18, 24, 38, 0.75);
-  --bg-card-hover: rgba(28, 36, 56, 0.85);
-  --bg-surface: #111827;
-  --bg-input: #1a2234;
+  --bg-dark: #070a12;
+  --bg-card: rgba(15, 22, 36, 0.85);
+  --bg-card-hover: rgba(24, 34, 54, 0.95);
+  --bg-surface: #0f172a;
+  --bg-input: #162032;
 
   --border-color: rgba(255, 255, 255, 0.08);
   --border-glow: rgba(59, 130, 246, 0.4);
 
   --primary: #3b82f6;
   --primary-hover: #2563eb;
-  --primary-glow: rgba(59, 130, 246, 0.25);
+  --primary-glow: rgba(59, 130, 246, 0.3);
 
   --accent-cyan: #06b6d4;
   --accent-emerald: #10b981;
   --accent-purple: #8b5cf6;
   --accent-rose: #f43f5e;
 
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
-  --text-dim: #6b7280;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
 
-  --nav-bg: rgba(9, 13, 22, 0.85);
+  --nav-bg: rgba(7, 10, 18, 0.88);
   --nav-brand-text: #ffffff;
   --body-bg-gradient: 
-    radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+    radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.12) 0%, transparent 45%);
 
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -37,8 +37,8 @@
   --radius-xl: 28px;
 
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 25px rgba(59, 130, 246, 0.2);
+  --shadow-md: 0 12px 30px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 30px rgba(59, 130, 246, 0.25);
 }
 
 /* Light Theme Overrides */
@@ -65,15 +65,15 @@
   --text-muted: #475569;
   --text-dim: #94a3b8;
 
-  --nav-bg: rgba(255, 255, 255, 0.9);
+  --nav-bg: rgba(255, 255, 255, 0.92);
   --nav-brand-text: #0f172a;
   --body-bg-gradient: 
-    radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.06) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(124, 58, 237, 0.06) 0%, transparent 40%);
+    radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 90% 90%, rgba(124, 58, 237, 0.08) 0%, transparent 45%);
 
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-  --shadow-glow: 0 0 25px rgba(37, 99, 235, 0.15);
+  --shadow-md: 0 12px 30px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-glow: 0 0 30px rgba(37, 99, 235, 0.15);
 }
 
 * {
@@ -130,8 +130,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .glass-panel {
   background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
@@ -161,7 +161,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+  box-shadow: 0 6px 22px rgba(37, 99, 235, 0.55);
   background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
 }
 
@@ -260,7 +260,7 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   z-index: 50;
   background: var(--nav-bg);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-color);
   padding: 0.75rem 0;
 }
@@ -364,11 +364,12 @@ h1, h2, h3, h4, h5, h6 {
   max-height: calc(100vh - 105px);
   overflow-y: auto;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   background: #525659;
   border-radius: var(--radius-md);
   padding: 1.25rem;
+  position: relative;
 }
 
 /* Tab Pills in Builder */
@@ -390,32 +391,6 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
-}
-
-/* Rich Text Formatting Toolbar */
-.editor-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: var(--bg-input);
-  padding: 0.35rem;
-  border-radius: 6px 6px 0 0;
-  border: 1px solid var(--border-color);
-  border-bottom: none;
-}
-
-.editor-btn {
-  padding: 0.3rem 0.5rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  color: var(--text-main);
-  cursor: pointer;
-}
-.editor-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Stats Cards */
