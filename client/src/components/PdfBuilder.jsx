@@ -2,8 +2,6 @@ import React, { useState, useRef } from 'react';
 import { Sparkles, CheckCircle2, Copy, Check, ExternalLink, ArrowRight, FileText } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import JeddahChamberDoc from './JeddahChamberDoc';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 
 export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
   const [formData, setFormData] = useState({
@@ -49,7 +47,6 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
     setError('');
 
     try {
-      // Send metadata to backend to obtain document record and QR Code
       const response = await fetch(`${API_BASE_URL}/api/pdfs/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -82,7 +79,7 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
   };
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
         <h1 style={{ fontSize: '1.75rem', marginBottom: '0.35rem' }}>
           Jeddah Chamber Certificate Builder (غرفة جدة)
@@ -93,8 +90,8 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
       </div>
 
       {!generatedDoc ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', gap: '1.5rem', alignItems: 'start' }}>
-          {/* Builder Form Inputs */}
+        <div className="builder-grid">
+          {/* Builder Form Inputs Column */}
           <div className="glass-panel" style={{ padding: '1.5rem', maxHeight: '85vh', overflowY: 'auto' }}>
             <h2 style={{ fontSize: '1.1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Sparkles size={18} color="#3b82f6" />
@@ -266,14 +263,14 @@ export default function PdfBuilder({ onGenerateSuccess, setActiveTab }) {
             </form>
           </div>
 
-          {/* 100% Exact Live Document Preview Panel */}
-          <div>
+          {/* 100% Exact Live Document Preview Column */}
+          <div style={{ width: '100%', overflowX: 'auto' }}>
             <div style={{ marginBottom: '0.75rem', fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <FileText size={16} color="#3b82f6" />
-              <span>Live Exact Preview (100% Replicated Layout)</span>
+              <span>Live Exact Preview (Full Layout Responsive Scaling)</span>
             </div>
 
-            <div ref={printRef} style={{ background: '#525659', padding: '20px', borderRadius: 'var(--radius-md)', overflowX: 'auto' }}>
+            <div ref={printRef} style={{ background: '#525659', padding: '20px', borderRadius: 'var(--radius-md)', minWidth: '100%', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
               <JeddahChamberDoc data={formData} isPreview={true} />
             </div>
           </div>
